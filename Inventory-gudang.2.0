@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Inventory Gudang Professional</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col md:flex-row">
+
+    <!-- Mobile Header Navigation -->
+    <header class="md:hidden bg-slate-900 text-white p-4 flex justify-between items-center no-print sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid font-bold fa-boxes-packing text-sky-400 text-2xl"></i>
+            <span class="font-bold text-lg tracking-wide">StockPro</span>
+        </div>
+        <button id="btnToggleMobileMenu" class="text-slate-300 hover:text-white p-2">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </header>
+
+    <!-- Sidebar Overlay Mobile -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden md:hidden no-print"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out w-64 bg-slate-900 text-slate-300 z-50 flex flex-col justify-between shrink-0 no-print">
+        <div>
+            <!-- Logo Brand -->
+            <div class="p-6 hidden md:flex items-center gap-3 border-b border-slate-800">
+                <div class="p-2 bg-sky-500/10 rounded-lg text-sky-400">
+                    <i class="fa-solid fa-boxes-packing text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white text-lg leading-tight tracking-wide">StockPro</h1>
+                    <p class="text-xs text-slate-400">Gudang & Inventory</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Menu Utama</p>
+                
+                <a href="#" data-page="dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-sky-600 text-white">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="#" data-page="master-barang" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-box w-5 text-center"></i>
+                    <span>Master Barang</span>
+                </a>
+
+                <a href="#" data-page="transaksi" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-arrow-right-left w-5 text-center"></i>
+                    <span>Transaksi Stock</span>
+                </a>
+
+                <a href="#" data-page="return" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-rotate-left w-5 text-center"></i>
+                    <span>Return Barang</span>
+                </a>
+
+                <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6">Laporan & Periodik</p>
+
+                <a href="#" data-page="closing" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-lock w-5 text-center"></i>
+                    <span>Closing Akhir Bulan</span>
+                </a>
+
+                <a href="#" data-page="riwayat" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
+                    <span>Riwayat & Laporan</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- System Controls & Footer -->
+        <div class="p-4 border-t border-slate-800 space-y-2">
+            <button onclick="openModalReset()" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition-colors">
+                <i class="fa-solid fa-trash-arrow-up"></i>
+                <span>Reset System / Data</span>
+            </button>
+            <div class="px-3 py-2 text-xs text-slate-500 text-center">
+                v2.5 Professional &bull; Safe LocalStorage
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto min-h-screen flex flex-col">
+        <!-- Top App Bar -->
+        <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex justify-between items-center no-print">
+            <div>
+                <h2 id="pageTitle" class="text-xl font-bold text-slate-800 dark:text-white">Dashboard Overview</h2>
+                <p id="pageSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Ringkasan real-time status inventory gudang</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- System Date Badge -->
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                    <i class="fa-regular fa-calendar-check text-sky-500"></i>
+                    <span id="currentDateDisplay">-</span>
+                </div>
+                <!-- Quick Stock Alert Trigger -->
+                <button onclick="switchTab('master-barang'); filterLowStock();" class="relative p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-600 dark:text-slate-300 transition-colors">
+                    <i class="fa-solid fa-bell"></i>
+                    <span id="alertBadgeCount" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center animate-pulse">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dynamic View Container -->
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6">
+
+            <!-- PAGE 1: DASHBOARD -->
+            <section id="page-dashboard" class="page-content space-y-6">
+                <!-- Summary Metrics Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Total Items -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Stok Barang</p>
+                            <h3 id="dashTotalStock" class="text-2xl font-bold text-slate-800 dark:text-white mt-1">0</h3>
+                            <p class="text-xs text-slate-500 mt-1"><span id="dashTotalSKU">0</span> SKU Produk</p>
+                        </div>
+                        <div class="p-3 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-xl">
+                            <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Barang Masuk Bulan Ini -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Barang Masuk (Bln Ini)</p>
+                            <h3 id="dashTotalIn" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</h3>
+                            <p class="text-xs text-slate-500 mt-1">Total Unit Diterima</p>
+                        </div>
+                        <div class="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                            <i class="fa-solid fa-arrow-down-left-long text-2xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Barang Keluar Bulan Ini -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Barang Keluar (Bln Ini)</p>
+                            <h3 id="dashTotalOut" class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">0</h3>
+                            <p class="text-xs text-slate-500 mt-1">Total Unit Terkirim</p>
+                        </div>
+                        <div class="p-3 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl">
+                            <i class="fa-solid fa-arrow-up-right-long text-2xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Total Return & Low Stock Alert -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Stok Menipis / Return</p>
+                            <div class="flex items-baseline gap-2 mt-1">
+                                <span id="dashLowStockCount" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</span>
+                                <span class="text-xs text-slate-400">/</span>
+                                <span id="dashReturnCount" class="text-lg font-semibold text-purple-600 dark:text-purple-400">0 Ret</span>
+                            </div>
+                            <p class="text-xs text-rose-500 font-medium mt-1">Perlu Perhatian Segera</p>
+                        </div>
+                        <div class="p-3 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl">
+                            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Visualizations & Quick Table Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Chart Main (2 Cols) -->
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="font-bold text-slate-800 dark:text-white text-base">Tren Pergerakan Barang</h3>
+                                <p class="text-xs text-slate-500">Perbandingan transaksi masuk & keluar beberapa bulan terakhir</p>
+                            </div>
+                            <span class="text-xs font-medium px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-md text-slate-600 dark:text-slate-300">Tahun Ini</span>
+                        </div>
+                        <div class="h-64 sm:h-72 relative">
+                            <canvas id="inventoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Alert Panel (1 Col) -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
+                                <i class="fa-solid fa-bell text-rose-500 text-sm"></i>
+                                Alert Stok Menipis
+                            </h3>
+                            <button onclick="switchTab('master-barang')" class="text-xs text-sky-600 hover:underline">Lihat Semua</button>
+                        </div>
+                        <div class="text-xs text-slate-500 mb-3">Barang yang sudah mencapai atau dibawah batas stok minimum.</div>
+                        
+                        <div id="dashLowStockList" class="flex-1 overflow-y-auto space-y-2.5 max-h-[260px] pr-1">
+                            <!-- Populated via Javascript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 2: MASTER BARANG -->
+            <section id="page-master-barang" class="page-content space-y-6 hidden">
+                <!-- Action Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="flex flex-1 items-center gap-3">
+                        <div class="relative flex-1 max-w-xs">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchMaster" placeholder="Cari Kode atau Nama Barang..." class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        </div>
+                        <select id="filterKategori" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                            <option value="">Semua Kategori</option>
+                        </select>
+                    </div>
+                    <button onclick="openModalBarang()" class="bg-sky-600 hover:bg-sky-700 text-white font-medium px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-2 shadow-sm transition-colors">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Tambah Barang Baru</span>
+                    </button>
+                </div>
+
+                <!-- Data Table -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                    <th class="p-4">Kode SKU</th>
+                                    <th class="p-4">Nama Barang</th>
+                                    <th class="p-4">Kategori</th>
+                                    <th class="p-4 text-center">Stok Saat Ini</th>
+                                    <th class="p-4 text-center">Stok Min</th>
+                                    <th class="p-4 text-right">Harga Unit (Rp)</th>
+                                    <th class="p-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableMasterBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 3: TRANSAKSI MASUK & KELUAR -->
+            <section id="page-transaksi" class="page-content space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Form Transaksi (1 Col) -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-right-left text-sky-500"></i>
+                            Input Transaksi Stok
+                        </h3>
+
+                        <form id="formTransaksi" onsubmit="handleSaveTransaksi(event)" class="space-y-4">
+                            <!-- Radio Tipe Transaksi -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">Jenis Transaksi</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="flex items-center justify-center p-2.5 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer bg-emerald-50/50 dark:bg-emerald-950/20 hover:border-emerald-500 transition-colors">
+                                        <input type="radio" name="txType" value="IN" checked class="text-emerald-600 focus:ring-emerald-500" onchange="toggleTxPartnerLabel()">
+                                        <span class="ml-2 text-xs font-bold text-emerald-700 dark:text-emerald-400">BARANG MASUK</span>
+                                    </label>
+                                    <label class="flex items-center justify-center p-2.5 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer bg-amber-50/50 dark:bg-amber-950/20 hover:border-amber-500 transition-colors">
+                                        <input type="radio" name="txType" value="OUT" class="text-amber-600 focus:ring-amber-500" onchange="toggleTxPartnerLabel()">
+                                        <span class="ml-2 text-xs font-bold text-amber-700 dark:text-amber-400">BARANG KELUAR</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Tanggal</label>
+                                <input type="date" id="txTanggal" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Pilih Barang</label>
+                                <select id="txBarangId" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500">
+                                    <!-- Populated JS -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label id="lblPartner" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Supplier / Pemasok</label>
+                                <input type="text" id="txPartner" placeholder="Nama Supplier/Customer..." required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Jumlah (Qty)</label>
+                                <input type="number" id="txJumlah" min="1" required placeholder="0" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Keterangan / Ref Nota</label>
+                                <textarea id="txKeterangan" rows="2" placeholder="Catatan tambahan..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-sky-500"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2.5 rounded-lg text-xs shadow-md transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Simpan Transaksi</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Recent Transactions Preview (2 Cols) -->
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base mb-4">Transaksi Terakhir Hari Ini</h3>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Tipe</th>
+                                        <th class="p-3">Barang</th>
+                                        <th class="p-3">Partner</th>
+                                        <th class="p-3 text-right">Jumlah</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableRecentTxBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 4: RETURN BARANG -->
+            <section id="page-return" class="page-content space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Return Form -->
+                    <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-rotate-left text-purple-500"></i>
+                            Input Return Barang
+                        </h3>
+
+                        <form id="formReturn" onsubmit="handleSaveReturn(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">Jenis Return</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label class="flex items-center justify-center p-2.5 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700">
+                                        <input type="radio" name="retType" value="RET_IN" checked class="text-purple-600 focus:ring-purple-500" onchange="toggleRetPartnerLabel()">
+                                        <span class="ml-1.5 text-xs text-slate-700 dark:text-slate-200">Return Masuk (Dari Cust)</span>
+                                    </label>
+                                    <label class="flex items-center justify-center p-2.5 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700">
+                                        <input type="radio" name="retType" value="RET_OUT" class="text-purple-600 focus:ring-purple-500" onchange="toggleRetPartnerLabel()">
+                                        <span class="ml-1.5 text-xs text-slate-700 dark:text-slate-200">Return Keluar (Ke Supp)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Tanggal</label>
+                                <input type="date" id="retTanggal" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Pilih Barang</label>
+                                <select id="retBarangId" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs">
+                                    <!-- Populated JS -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label id="lblRetPartner" class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Nama Customer</label>
+                                <input type="text" id="retPartner" placeholder="Pihak terkait..." required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Jumlah Unit Return</label>
+                                <input type="number" id="retJumlah" min="1" required placeholder="0" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Alasan Return / Kondisi</label>
+                                <select id="retAlasan" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs mb-2">
+                                    <option value="Rusak/Cacat">Barang Rusak / Cacat Pabrik</option>
+                                    <option value="Salah Kirim">Salah Kirim Spesifikasi</option>
+                                    <option value="Expired/Kadaluarsa">Mendekati / Kadaluarsa</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                                <input type="text" id="retKeterangan" placeholder="Keterangan detail..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs">
+                            </div>
+
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2.5 rounded-lg text-xs shadow-md transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Proses Return</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- History Return -->
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base mb-4">Riwayat Return Barang</h3>
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Jenis</th>
+                                        <th class="p-3">Barang</th>
+                                        <th class="p-3">Pihak Terkait</th>
+                                        <th class="p-3">Alasan</th>
+                                        <th class="p-3 text-right">Qty</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableReturnBody" class="divide-y divide-slate-200 dark:divide-slate-700 text-xs">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 5: CLOSING AKHIR BULAN -->
+            <section id="page-closing" class="page-content space-y-6 hidden">
+                <!-- Panel Pilih Periode Closing -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Closing & Rekapitulasi Bulanan</h3>
+                        <p class="text-xs text-slate-500">Hitung dan kunci saldo mutasi stok akhir bulan secara resmi</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <input type="month" id="closingMonthPicker" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-medium">
+                        <button onclick="generateClosingSummary()" class="bg-sky-600 hover:bg-sky-700 text-white text-xs px-4 py-2 rounded-lg font-medium transition-colors">
+                            Hitung Rekap
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preview Closing Report Sheet -->
+                <div id="printAreaClosing" class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div class="flex justify-between items-start border-b border-slate-200 dark:border-slate-700 pb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white uppercase tracking-wider">LAPORAN MUTASI & CLOSING STOK</h2>
+                            <p class="text-xs text-slate-500 mt-1">Periode: <span id="closingPeriodTitle" class="font-bold text-slate-700 dark:text-slate-300">-</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold" id="closingStatusBadge">SIAP CLOSING</span>
+                            <p class="text-[10px] text-slate-400 mt-1">Sistem StockPro Pro</p>
+                        </div>
+                    </div>
+
+                    <!-- Summary Stat Boxes -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="text-slate-500">Total Unit Masuk:</span>
+                            <div id="closingSummaryIn" class="text-base font-bold text-emerald-600 mt-0.5">0</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="text-slate-500">Total Unit Keluar:</span>
+                            <div id="closingSummaryOut" class="text-base font-bold text-amber-600 mt-0.5">0</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="text-slate-500">Total Net Return:</span>
+                            <div id="closingSummaryReturn" class="text-base font-bold text-purple-600 mt-0.5">0</div>
+                        </div>
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="text-slate-500">Total Nilai Inventaris:</span>
+                            <div id="closingSummaryValuation" class="text-base font-bold text-sky-600 mt-0.5">Rp 0</div>
+                        </div>
+                    </div>
+
+                    <!-- Closing Details Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
+                                    <th class="p-3">Kode SKU</th>
+                                    <th class="p-3">Nama Barang</th>
+                                    <th class="p-3 text-right">Stok Awal</th>
+                                    <th class="p-3 text-right">Masuk</th>
+                                    <th class="p-3 text-right">Keluar</th>
+                                    <th class="p-3 text-right">Return Net</th>
+                                    <th class="p-3 text-right">Stok Akhir</th>
+                                    <th class="p-3 text-right">Nilai Akhir (Rp)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableClosingBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <!-- Populated JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer Controls -->
+                    <div class="pt-4 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
+                        <div class="text-xs text-slate-500">
+                            <i class="fa-solid fa-circle-info text-sky-500 mr-1"></i>
+                            Melakukan Lock Closing akan mengunci transaksi pada periode ini.
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="window.print()" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fa-solid fa-print mr-1.5"></i> Cetak PDF / Print
+                            </button>
+                            <button id="btnLockClosing" onclick="lockCurrentClosing()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-lock"></i> Lock & Simpan Closing
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 6: RIWAYAT & LAPORAN -->
+            <section id="page-riwayat" class="page-content space-y-6 hidden">
+                <!-- Filter Controls -->
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Dari Tanggal</label>
+                            <input type="date" id="filterDateStart" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Sampai Tanggal</label>
+                            <input type="date" id="filterDateEnd" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Jenis Transaksi</label>
+                            <select id="filterType" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                                <option value="">Semua Jenis</option>
+                                <option value="IN">Masuk (IN)</option>
+                                <option value="OUT">Keluar (OUT)</option>
+                                <option value="RET_IN">Return Masuk</option>
+                                <option value="RET_OUT">Return Keluar</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button onclick="applyReportFilter()" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 rounded-lg text-xs transition-colors">
+                                Filter Data
+                            </button>
+                            <button onclick="exportToCSV()" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg text-xs" title="Export Excel / CSV">
+                                <i class="fa-solid fa-file-csv text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                                    <th class="p-3">Waktu Input</th>
+                                    <th class="p-3">Tanggal TX</th>
+                                    <th class="p-3">Tipe</th>
+                                    <th class="p-3">SKU / Nama Barang</th>
+                                    <th class="p-3">Partner / Pihak</th>
+                                    <th class="p-3 text-right">Jumlah</th>
+                                    <th class="p-3">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableHistoryBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODAL CONFIRMATION RESET DATA -->
+    <div id="modalReset" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all">
+            <div class="p-6 text-center space-y-4">
+                <div class="w-16 h-16 bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 dark:text-white">Opsi Reset System Data</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Pilih metode pembersihan data aplikasi di bawah ini. Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <!-- Opsi 1: Reset Total -->
+                    <button onclick="executeReset('TOTAL')" class="w-full p-3 bg-slate-50 dark:bg-slate-900/80 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-slate-200 dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-800 rounded-xl text-left transition-all group">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-rose-500 text-white rounded-lg text-sm">
+                                <i class="fa-solid fa-broom"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-rose-600 dark:group-hover:text-rose-400">Pembersihan Total (Semua 0)</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400">Kosongkan seluruh master barang, transaksi masuk/keluar, return, dan closing.</div>
+                            </div>
+                        </div>
+                    </button>
+
+                    <!-- Opsi 2: Reset Demo Data (Transaksi 0) -->
+                    <button onclick="executeReset('DEMO')" class="w-full p-3 bg-slate-50 dark:bg-slate-900/80 hover:bg-sky-50 dark:hover:bg-sky-950/30 border border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-800 rounded-xl text-left transition-all group">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-sky-500 text-white rounded-lg text-sm">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400">Kembalikan Data Demo (Transaksi 0)</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400">Muat ulang master produk sampel, lalu hapus seluruh riwayat transaksi & closing jadi 0.</div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+                <button onclick="closeModalReset()" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORM BARANG (CREATE / EDIT) -->
+    <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 id="modalBarangTitle" class="font-bold text-slate-800 dark:text-white text-base">Tambah Barang Baru</h3>
+                <button onclick="closeModalBarang()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="formMasterBarang" onsubmit="handleSaveBarang(event)" class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="barangEditId">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Kode SKU *</label>
+                        <input type="text" id="barangKode" required placeholder="Contoh: BRG-001" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Kategori *</label>
+                        <input type="text" id="barangKategori" required placeholder="Elektronik, Perkakas, dll" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Nama Barang *</label>
+                    <input type="text" id="barangNama" required placeholder="Nama lengkap barang..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                </div>
+
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Stok Awal</label>
+                        <input type="number" id="barangStok" min="0" value="0" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Stok Min *</label>
+                        <input type="number" id="barangStokMin" min="0" value="5" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Satuan</label>
+                        <input type="text" id="barangSatuan" placeholder="Pcs, Box, Kg" value="Pcs" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Harga Satuan (Rp) *</label>
+                    <input type="number" id="barangHarga" min="0" required placeholder="0" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg">
+                </div>
+
+                <div class="pt-3 flex justify-end gap-3 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeModalBarang()" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-medium transition-colors">
+                        Simpan Barang
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA STATE INITIALIZATION ---
+        const INITIAL_BARANG = [
+            { id: '1', kode: 'SKU-1001', nama: 'Laptop Pro 14 Inch', kategori: 'Elektronik', stok: 15, minStok: 5, harga: 12500000, satuan: 'Unit' },
+            { id: '2', kode: 'SKU-1002', nama: 'Mouse Wireless Silent', kategori: 'Aksesori', stok: 4, minStok: 10, harga: 150000, satuan: 'Pcs' },
+            { id: '3', kode: 'SKU-1003', name: 'Keyboard Mechanical RGB', nama: 'Keyboard Mechanical RGB', kategori: 'Aksesori', stok: 8, minStok: 5, harga: 450000, satuan: 'Pcs' },
+            { id: '4', kode: 'SKU-1004', nama: 'Monitor 24 Inch IPS', kategori: 'Elektronik', stok: 2, minStok: 4, harga: 2100000, satuan: 'Unit' },
+            { id: '5', kode: 'SKU-1005', nama: 'Kabel HDMI 2.1 2 Meter', kategori: 'Kabel', stok: 45, minStok: 15, harga: 75000, satuan: 'Pcs' }
+        ];
+
+        const INITIAL_TRANSAKSI = [
+            { id: 'tx-1', timestamp: new Date(Date.now() - 86400000*3).toISOString(), tanggal: getFormattedDate(-3), type: 'IN', barangId: '1', qty: 10, partner: 'PT Tech Supplier', ket: 'Pembelian stok awal' },
+            { id: 'tx-2', timestamp: new Date(Date.now() - 86400000*2).toISOString(), tanggal: getFormattedDate(-2), type: 'OUT', barangId: '2', qty: 5, partner: 'CV Retail Sejahtera', ket: 'Penjualan nota #102' },
+            { id: 'tx-3', timestamp: new Date(Date.now() - 86400000*1).toISOString(), tanggal: getFormattedDate(-1), type: 'RET_IN', barangId: '2', qty: 1, partner: 'CV Retail Sejahtera', ket: 'Return kardus rusak', alasan: 'Rusak/Cacat' }
+        ];
+
+        let state = {
+            barang: JSON.parse(localStorage.getItem('stockpro_barang')) || INITIAL_BARANG,
+            transaksi: JSON.parse(localStorage.getItem('stockpro_transaksi')) || INITIAL_TRANSAKSI,
+            closings: JSON.parse(localStorage.getItem('stockpro_closings')) || {}
+        };
+
+        let chartInstance = null;
+
+        // --- HELPER FUNCTIONS ---
+        function getFormattedDate(offsetDays = 0) {
+            const d = new Date();
+            d.setDate(d.getDate() + offsetDays);
+            return d.toISOString().split('T')[0];
+        }
+
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('stockpro_barang', JSON.stringify(state.barang));
+            localStorage.setItem('stockpro_transaksi', JSON.stringify(state.transaksi));
+            localStorage.setItem('stockpro_closings', JSON.stringify(state.closings));
+        }
+
+        // --- NAVIGATION & UI TABS ---
+        function switchTab(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-sky-600', 'text-white');
+                el.classList.add('text-slate-400');
+            });
+
+            const activePage = document.getElementById(`page-${pageId}`);
+            if (activePage) activePage.classList.remove('hidden');
+
+            const activeNav = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+            if (activeNav) {
+                activeNav.classList.add('bg-sky-600', 'text-white');
+                activeNav.classList.remove('text-slate-400');
+            }
+
+            // Title updates
+            const titles = {
+                'dashboard': ['Dashboard Overview', 'Ringkasan real-time status inventory gudang'],
+                'master-barang': ['Master Data Barang', 'Kelola daftar stok, harga, dan ambang minimum'],
+                'transaksi': ['Transaksi Stok', 'Catat pergerakan barang masuk dan keluar'],
+                'return': ['Return Barang', 'Kelola return dari customer atau ke supplier'],
+                'closing': ['Closing Akhir Bulan', 'Kunci dan rekapitulasi mutasi bulanan'],
+                'riwayat': ['Riwayat & Laporan', 'Audit trail transaksi dan filter laporan']
+            };
+
+            if (titles[pageId]) {
+                document.getElementById('pageTitle').innerText = titles[pageId][0];
+                document.getElementById('pageSubtitle').innerText = titles[pageId][1];
+            }
+
+            // Re-render specific views on view switch
+            if (pageId === 'dashboard') renderDashboard();
+            if (pageId === 'master-barang') renderMasterTable();
+            if (pageId === 'transaksi') renderTransaksiPage();
+            if (pageId === 'return') renderReturnPage();
+            if (pageId === 'closing') initClosingPage();
+            if (pageId === 'riwayat') renderHistoryTable();
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebarOverlay').classList.add('hidden');
+        }
+
+        // --- DASHBOARD LOGIC ---
+        function renderDashboard() {
+            // Metrics Calculations
+            const totalStock = state.barang.reduce((acc, item) => acc + Number(item.stok), 0);
+            const totalSKU = state.barang.length;
+
+            const now = new Date();
+            const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+            const monthTx = state.transaksi.filter(t => t.tanggal.startsWith(currentMonthStr));
+            
+            const totalIn = monthTx.filter(t => t.type === 'IN').reduce((acc, t) => acc + Number(t.qty), 0);
+            const totalOut = monthTx.filter(t => t.type === 'OUT').reduce((acc, t) => acc + Number(t.qty), 0);
+            
+            const lowStockItems = state.barang.filter(b => Number(b.stok) <= Number(b.minStok));
+            const returnTxCount = monthTx.filter(t => t.type === 'RET_IN' || t.type === 'RET_OUT').length;
+
+            document.getElementById('dashTotalStock').innerText = totalStock.toLocaleString('id-ID');
+            document.getElementById('dashTotalSKU').innerText = totalSKU;
+            document.getElementById('dashTotalIn').innerText = totalIn.toLocaleString('id-ID');
+            document.getElementById('dashTotalOut').innerText = totalOut.toLocaleString('id-ID');
+            document.getElementById('dashLowStockCount').innerText = lowStockItems.length;
+            document.getElementById('dashReturnCount').innerText = `${returnTxCount} Ret`;
+
+            // Alert Badge Top
+            const badge = document.getElementById('alertBadgeCount');
+            if (lowStockItems.length > 0) {
+                badge.innerText = lowStockItems.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            // Low Stock Sidebar List
+            const lowStockContainer = document.getElementById('dashLowStockList');
+            if (lowStockItems.length === 0) {
+                lowStockContainer.innerHTML = `<div class="text-slate-400 text-center py-8">Semua stok barang aman 👍</div>`;
+            } else {
+                lowStockContainer.innerHTML = lowStockItems.map(item => `
+                    <div class="p-2.5 rounded-lg border border-rose-200 dark:border-rose-900/50 bg-rose-50/50 dark:bg-rose-950/20 flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-slate-800 dark:text-slate-200">${item.nama}</div>
+                            <div class="text-[10px] text-slate-500">${item.kode} &bull; Min: ${item.minStok} ${item.satuan}</div>
+                        </div>
+                        <span class="px-2 py-1 bg-rose-500 text-white font-bold rounded text-[10px]">
+                            Stok: ${item.stok}
+                        </span>
+                    </div>
+                `).join('');
+            }
+
+            renderChart();
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('inventoryChart').getContext('2d');
+            
+            // Build last 6 months labels
+            const labels = [];
+            const dataIn = [];
+            const dataOut = [];
+
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date();
+                d.setMonth(d.getMonth() - i);
+                const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const monthName = d.toLocaleString('id-ID', { month: 'short' });
+                labels.push(monthName);
+
+                const txs = state.transaksi.filter(t => t.tanggal.startsWith(monthStr));
+                dataIn.push(txs.filter(t => t.type === 'IN').reduce((a, b) => a + Number(b.qty), 0));
+                dataOut.push(txs.filter(t => t.type === 'OUT').reduce((a, b) => a + Number(b.qty), 0));
+            }
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Barang Masuk (IN)',
+                            data: dataIn,
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Barang Keluar (OUT)',
+                            data: dataOut,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- MASTER BARANG CRUD ---
+        function renderMasterTable() {
+            const search = document.getElementById('searchMaster').value.toLowerCase();
+            const catFilter = document.getElementById('filterKategori').value;
+
+            // Populate Category Select
+            const categories = [...new Set(state.barang.map(b => b.kategori))];
+            const selectCat = document.getElementById('filterKategori');
+            selectCat.innerHTML = `<option value="">Semua Kategori</option>` + 
+                categories.map(c => `<option value="${c}" ${c === catFilter ? 'selected' : ''}>${c}</option>`).join('');
+
+            const filtered = state.barang.filter(item => {
+                const matchSearch = item.nama.toLowerCase().includes(search) || item.kode.toLowerCase().includes(search);
+                const matchCat = catFilter === '' || item.kategori === catFilter;
+                return matchSearch && matchCat;
+            });
+
+            const tbody = document.getElementById('tableMasterBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada data barang ditemukan.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const isLow = Number(item.stok) <= Number(item.minStok);
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                        <td class="p-4 font-mono font-bold text-slate-700 dark:text-slate-300">${item.kode}</td>
+                        <td class="p-4 font-semibold text-slate-800 dark:text-white">${item.nama}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">${item.kategori}</span></td>
+                        <td class="p-4 text-center">
+                            <span class="px-2 py-1 rounded font-bold ${isLow ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200'}">
+                                ${item.stok} ${item.satuan}
+                            </span>
+                        </td>
+                        <td class="p-4 text-center text-slate-500">${item.minStok} ${item.satuan}</td>
+                        <td class="p-4 text-right font-medium">${formatRupiah(item.harga)}</td>
+                        <td class="p-4 text-center space-x-2">
+                            <button onclick="editBarang('${item.id}')" class="text-sky-600 hover:text-sky-800 p-1" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteBarang('${item.id}')" class="text-rose-600 hover:text-rose-800 p-1" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterLowStock() {
+            document.getElementById('searchMaster').value = '';
+            document.getElementById('filterKategori').value = '';
+            renderMasterTable();
+        }
+
+        function openModalBarang(isEdit = false) {
+            document.getElementById('modalBarangTitle').innerText = isEdit ? 'Edit Data Barang' : 'Tambah Barang Baru';
+            document.getElementById('modalBarang').classList.remove('hidden');
+        }
+
+        function closeModalBarang() {
+            document.getElementById('modalBarang').classList.add('hidden');
+            document.getElementById('formMasterBarang').reset();
+            document.getElementById('barangEditId').value = '';
+        }
+
+        function handleSaveBarang(e) {
+            e.preventDefault();
+            const editId = document.getElementById('barangEditId').value;
+            const kode = document.getElementById('barangKode').value.trim();
+            const nama = document.getElementById('barangNama').value.trim();
+            const kategori = document.getElementById('barangKategori').value.trim();
+            const stok = Number(document.getElementById('barangStok').value);
+            const minStok = Number(document.getElementById('barangStokMin').value);
+            const satuan = document.getElementById('barangSatuan').value.trim() || 'Pcs';
+            const harga = Number(document.getElementById('barangHarga').value);
+
+            if (editId) {
+                // Update
+                const idx = state.barang.findIndex(b => b.id === editId);
+                if (idx !== -1) {
+                    state.barang[idx] = { ...state.barang[idx], kode, nama, kategori, stok, minStok, satuan, harga };
+                }
+            } else {
+                // New
+                const newItem = {
+                    id: Date.now().toString(),
+                    kode, nama, kategori, stok, minStok, satuan, harga
+                };
+                state.barang.push(newItem);
+            }
+
+            saveToLocalStorage();
+            closeModalBarang();
+            renderMasterTable();
+        }
+
+        function editBarang(id) {
+            const item = state.barang.find(b => b.id === id);
+            if (!item) return;
+
+            document.getElementById('barangEditId').value = item.id;
+            document.getElementById('barangKode').value = item.kode;
+            document.getElementById('barangNama').value = item.nama;
+            document.getElementById('barangKategori').value = item.kategori;
+            document.getElementById('barangStok').value = item.stok;
+            document.getElementById('barangStokMin').value = item.minStok;
+            document.getElementById('barangSatuan').value = item.satuan;
+            document.getElementById('barangHarga').value = item.harga;
+
+            openModalBarang(true);
+        }
+
+        function deleteBarang(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus barang ini? Data transaksi terkait tetap tersimpan.')) {
+                state.barang = state.barang.filter(b => b.id !== id);
+                saveToLocalStorage();
+                renderMasterTable();
+            }
+        }
+
+        // --- TRANSAKSI MASUK & KELUAR ---
+        function renderTransaksiPage() {
+            document.getElementById('txTanggal').value = getFormattedDate();
+            
+            // Populate select barang
+            const select = document.getElementById('txBarangId');
+            select.innerHTML = state.barang.map(b => `<option value="${b.id}">${b.kode} - ${b.nama} (Stok: ${b.stok})</option>`).join('');
+
+            renderRecentTxTable();
+        }
+
+        function toggleTxPartnerLabel() {
+            const txType = document.querySelector('input[name="txType"]:checked').value;
+            const lbl = document.getElementById('lblPartner');
+            lbl.innerText = txType === 'IN' ? 'Supplier / Pemasok' : 'Customer / Pembeli';
+        }
+
+        function handleSaveTransaksi(e) {
+            e.preventDefault();
+            const type = document.querySelector('input[name="txType"]:checked').value;
+            const tanggal = document.getElementById('txTanggal').value;
+            const barangId = document.getElementById('txBarangId').value;
+            const partner = document.getElementById('txPartner').value.trim();
+            const qty = Number(document.getElementById('txJumlah').value);
+            const ket = document.getElementById('txKeterangan').value.trim();
+
+            const barang = state.barang.find(b => b.id === barangId);
+            if (!barang) return;
+
+            // Check stock sufficiency for OUT
+            if (type === 'OUT' && barang.stok < qty) {
+                alert(`Stok tidak mencukupi! Stok saat ini: ${barang.stok}`);
+                return;
+            }
+
+            // Update Stock
+            if (type === 'IN') barang.stok += qty;
+            if (type === 'OUT') barang.stok -= qty;
+
+            // Record Tx
+            const newTx = {
+                id: 'tx-' + Date.now(),
+                timestamp: new Date().toISOString(),
+                tanggal,
+                type,
+                barangId,
+                qty,
+                partner,
+                ket
+            };
+
+            state.transaksi.unshift(newTx);
+            saveToLocalStorage();
+
+            document.getElementById('formTransaksi').reset();
+            renderTransaksiPage();
+            alert('Transaksi berhasil disimpan dan stok otomatis terupdate!');
+        }
+
+        function renderRecentTxTable() {
+            const recent = state.transaksi.slice(0, 5);
+            const tbody = document.getElementById('tableRecentTxBody');
+
+            if (recent.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400">Belum ada transaksi.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = recent.map(t => {
+                const barang = state.barang.find(b => b.id === t.barangId) || { nama: 'Barang Dihapus' };
+                const isIn = t.type === 'IN';
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <td class="p-3 text-slate-500">${t.tanggal}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isIn ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'}">
+                                ${t.type}
+                            </span>
+                        </td>
+                        <td class="p-3 font-medium">${barang.nama}</td>
+                        <td class="p-3 text-slate-500">${t.partner}</td>
+                        <td class="p-3 text-right font-bold ${isIn ? 'text-emerald-600' : 'text-amber-600'}">
+                            ${isIn ? '+' : '-'}${t.qty}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- RETURN BARANG LOGIC ---
+        function renderReturnPage() {
+            document.getElementById('retTanggal').value = getFormattedDate();
+            
+            const select = document.getElementById('retBarangId');
+            select.innerHTML = state.barang.map(b => `<option value="${b.id}">${b.kode} - ${b.nama} (Stok: ${b.stok})</option>`).join('');
+
+            renderReturnTable();
+        }
+
+        function toggleRetPartnerLabel() {
+            const retType = document.querySelector('input[name="retType"]:checked').value;
+            const lbl = document.getElementById('lblRetPartner');
+            lbl.innerText = retType === 'RET_IN' ? 'Customer / Pembeli' : 'Supplier / Pemasok';
+        }
+
+        function handleSaveReturn(e) {
+            e.preventDefault();
+            const type = document.querySelector('input[name="retType"]:checked').value;
+            const tanggal = document.getElementById('retTanggal').value;
+            const barangId = document.getElementById('retBarangId').value;
+            const partner = document.getElementById('retPartner').value.trim();
+            const qty = Number(document.getElementById('retJumlah').value);
+            const alasan = document.getElementById('retAlasan').value;
+            const ket = document.getElementById('retKeterangan').value.trim();
+
+            const barang = state.barang.find(b => b.id === barangId);
+            if (!barang) return;
+
+            if (type === 'RET_OUT' && barang.stok < qty) {
+                alert(`Stok tidak cukup untuk return keluar! Stok saat ini: ${barang.stok}`);
+                return;
+            }
+
+            // Adjust Stock
+            // RET_IN = Customer mengembalikan barang ke gudang (+)
+            // RET_OUT = Gudang mengembalikan barang ke Supplier (-)
+            if (type === 'RET_IN') barang.stok += qty;
+            if (type === 'RET_OUT') barang.stok -= qty;
+
+            const newTx = {
+                id: 'ret-' + Date.now(),
+                timestamp: new Date().toISOString(),
+                tanggal,
+                type,
+                barangId,
+                qty,
+                partner,
+                alasan,
+                ket
+            };
+
+            state.transaksi.unshift(newTx);
+            saveToLocalStorage();
+
+            document.getElementById('formReturn').reset();
+            renderReturnPage();
+            alert('Transaksi return berhasil diproses!');
+        }
+
+        function renderReturnTable() {
+            const returns = state.transaksi.filter(t => t.type === 'RET_IN' || t.type === 'RET_OUT');
+            const tbody = document.getElementById('tableReturnBody');
+
+            if (returns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">Belum ada transaksi return.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = returns.map(t => {
+                const barang = state.barang.find(b => b.id === t.barangId) || { nama: 'Barang Dihapus' };
+                const isRetIn = t.type === 'RET_IN';
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <td class="p-3 text-slate-500">${t.tanggal}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                                ${isRetIn ? 'RET MASUK' : 'RET KELUAR'}
+                            </span>
+                        </td>
+                        <td class="p-3 font-medium">${barang.nama}</td>
+                        <td class="p-3 text-slate-500">${t.partner}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-[10px]">${t.alasan || 'Lainnya'}</span></td>
+                        <td class="p-3 text-right font-bold text-purple-600">${isRetIn ? '+' : '-'}${t.qty}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // --- CLOSING AKHIR BULAN LOGIC ---
+        function initClosingPage() {
+            const now = new Date();
+            const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            document.getElementById('closingMonthPicker').value = monthStr;
+            generateClosingSummary();
+        }
+
+        function generateClosingSummary() {
+            const selectedMonth = document.getElementById('closingMonthPicker').value;
+            if (!selectedMonth) return;
+
+            document.getElementById('closingPeriodTitle').innerText = selectedMonth;
+
+            const isLocked = state.closings[selectedMonth] ? true : false;
+            const badge = document.getElementById('closingStatusBadge');
+            const btnLock = document.getElementById('btnLockClosing');
+
+            if (isLocked) {
+                badge.innerText = 'LOCKED / TERKUNCI';
+                badge.className = 'inline-block px-3 py-1 bg-slate-200 text-slate-700 rounded-full text-xs font-bold';
+                btnLock.disabled = true;
+                btnLock.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                badge.innerText = 'SIAP CLOSING';
+                badge.className = 'inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold';
+                btnLock.disabled = false;
+                btnLock.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Calculations per Item for selected month
+            let totalValuation = 0;
+            let sumIn = 0;
+            let sumOut = 0;
+            let sumRet = 0;
+
+            const tbody = document.getElementById('tableClosingBody');
+
+            tbody.innerHTML = state.barang.map(item => {
+                // Filter transactions up to month end or within month
+                const itemTx = state.transaksi.filter(t => t.barangId === item.id && t.tanggal.startsWith(selectedMonth));
+                
+                const txIn = itemTx.filter(t => t.type === 'IN').reduce((a, b) => a + Number(b.qty), 0);
+                const txOut = itemTx.filter(t => t.type === 'OUT').reduce((a, b) => a + Number(b.qty), 0);
+                const txRetIn = itemTx.filter(t => t.type === 'RET_IN').reduce((a, b) => a + Number(b.qty), 0);
+                const txRetOut = itemTx.filter(t => t.type === 'RET_OUT').reduce((a, b) => a + Number(b.qty), 0);
+
+                const netReturn = txRetIn - txRetOut;
+                
+                // Estimation of initial stock = Current Stock - (IN - OUT + RET_NET)
+                const stokAkhir = item.stok; 
+                const stokAwal = stokAkhir - (txIn - txOut + netReturn);
+
+                const nilaiAkhir = stokAkhir * item.harga;
+                totalValuation += nilaiAkhir;
+
+                sumIn += txIn;
+                sumOut += txOut;
+                sumRet += netReturn;
+
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <td class="p-3 font-mono font-bold">${item.kode}</td>
+                        <td class="p-3 font-medium">${item.nama}</td>
+                        <td class="p-3 text-right text-slate-500">${stokAwal}</td>
+                        <td class="p-3 text-right text-emerald-600 font-medium">+${txIn}</td>
+                        <td class="p-3 text-right text-amber-600 font-medium">-${txOut}</td>
+                        <td class="p-3 text-right text-purple-600 font-medium">${netReturn >= 0 ? '+' : ''}${netReturn}</td>
+                        <td class="p-3 text-right font-bold">${stokAkhir} ${item.satuan}</td>
+                        <td class="p-3 text-right font-medium">${formatRupiah(nilaiAkhir)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('closingSummaryIn').innerText = sumIn;
+            document.getElementById('closingSummaryOut').innerText = sumOut;
+            document.getElementById('closingSummaryReturn').innerText = sumRet;
+            document.getElementById('closingSummaryValuation').innerText = formatRupiah(totalValuation);
+        }
+
+        function lockCurrentClosing() {
+            const selectedMonth = document.getElementById('closingMonthPicker').value;
+            if (!selectedMonth) return;
+
+            if (confirm(`Apakah Anda yakin ingin mengunci (Lock) Laporan Closing periode ${selectedMonth}?`)) {
+                state.closings[selectedMonth] = {
+                    lockedAt: new Date().toISOString(),
+                    totalValuation: document.getElementById('closingSummaryValuation').innerText
+                };
+                saveToLocalStorage();
+                generateClosingSummary();
+                alert(`Closing periode ${selectedMonth} berhasil dikunci!`);
+            }
+        }
+
+        // --- HISTORY & REPORT FILTERS ---
+        function renderHistoryTable(data = state.transaksi) {
+            const tbody = document.getElementById('tableHistoryBody');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada riwayat transaksi ditemukan.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(t => {
+                const barang = state.barang.find(b => b.id === t.barangId) || { kode: '-', nama: 'Barang Dihapus' };
+                const timeStr = new Date(t.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                        <td class="p-3 text-slate-400 text-[11px]">${timeStr}</td>
+                        <td class="p-3 text-slate-600 dark:text-slate-300 font-medium">${t.tanggal}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                                t.type === 'IN' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950' :
+                                t.type === 'OUT' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950' :
+                                'bg-purple-100 text-purple-700 dark:bg-purple-950'
+                            }">
+                                ${t.type}
+                            </span>
+                        </td>
+                        <td class="p-3 font-medium">${barang.kode} - ${barang.nama}</td>
+                        <td class="p-3 text-slate-500">${t.partner || '-'}</td>
+                        <td class="p-3 text-right font-bold">${t.qty}</td>
+                        <td class="p-3 text-slate-500">${t.ket || t.alasan || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function applyReportFilter() {
+            const start = document.getElementById('filterDateStart').value;
+            const end = document.getElementById('filterDateEnd').value;
+            const type = document.getElementById('filterType').value;
+
+            let filtered = [...state.transaksi];
+
+            if (start) filtered = filtered.filter(t => t.tanggal >= start);
+            if (end) filtered = filtered.filter(t => t.tanggal <= end);
+            if (type) filtered = filtered.filter(t => t.type === type);
+
+            renderHistoryTable(filtered);
+        }
+
+        function exportToCSV() {
+            if (state.transaksi.length === 0) {
+                alert('Tidak ada data untuk diexport.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,ID,Tanggal,Tipe,SKU,Nama Barang,Partner,Qty,Keterangan\n";
+            
+            state.transaksi.forEach(t => {
+                const barang = state.barang.find(b => b.id === t.barangId) || { kode: '-', nama: 'Dihapus' };
+                const row = [
+                    t.id,
+                    t.tanggal,
+                    t.type,
+                    `"${barang.kode}"`,
+                    `"${barang.nama}"`,
+                    `"${t.partner || ''}"`,
+                    t.qty,
+                    `"${t.ket || t.alasan || ''}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `laporan_inventory_${getFormattedDate()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- RESET DATA SYSTEM (FIXED) ---
+        function openModalReset() {
+            document.getElementById('modalReset').classList.remove('hidden');
+        }
+
+        function closeModalReset() {
+            document.getElementById('modalReset').classList.add('hidden');
+        }
+
+        function executeReset(mode) {
+            if (mode === 'TOTAL') {
+                // Hard Reset: Clean All
+                state.barang = [];
+                state.transaksi = [];
+                state.closings = {};
+            } else if (mode === 'DEMO') {
+                // Demo Reset: Load Master Products, Clear All Transactions & Closings
+                state.barang = INITIAL_BARANG.map(b => ({ ...b }));
+                state.transaksi = [];
+                state.closings = {};
+            }
+
+            // Synchronize with LocalStorage
+            saveToLocalStorage();
+            closeModalReset();
+
+            // Refresh UI across active views
+            switchTab('dashboard');
+            alert(mode === 'TOTAL' ? 'Sistem berhasil dibersihkan total (Semua data 0).' : 'Data demo berhasil dipulihkan. Seluruh transaksi barang masuk/keluar di-reset ke 0.');
+        }
+
+        // --- INITIALIZATION ON LOAD ---
+        window.onload = function() {
+            // Set current date UI
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('id-ID', options);
+
+            // Bind Navigation Clicks
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    switchTab(page);
+                });
+            });
+
+            // Mobile Menu Toggle
+            document.getElementById('btnToggleMobileMenu').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('-translate-x-full');
+                document.getElementById('sidebarOverlay').classList.toggle('hidden');
+            });
+
+            document.getElementById('sidebarOverlay').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebarOverlay').classList.add('hidden');
+            });
+
+            // Search listener
+            document.getElementById('searchMaster').addEventListener('input', renderMasterTable);
+            document.getElementById('filterKategori').addEventListener('change', renderMasterTable);
+
+            // Default Load
+            switchTab('dashboard');
+        };
+    </script>
+</body>
+</html>
